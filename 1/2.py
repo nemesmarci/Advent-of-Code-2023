@@ -26,7 +26,7 @@ def replace_first(line):
 
 def replace_last(line):
     max_index = len(line) - 1 - next((i for i, c in enumerate(line[::-1])
-                                      if get_digit(c)), -1)
+                                      if get_digit(c)), len(line))
     last = None
     for num in DIGITS:
         if (index := line.rfind(num)) > max_index:

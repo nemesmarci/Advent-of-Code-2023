@@ -1,10 +1,6 @@
 from common import parse
 
 
-def intersection(r1, r2):
-    return range(max(r1.start, r2.start), min(r1.stop, r2.stop))
-
-
 def transform_ranges(original_ranges, rules):
     new_ranges = []
     for source_range in original_ranges:

@@ -9,23 +9,6 @@ def get_neighbours(current):
             (current[0] + 1, current[1]))
 
 
-def start_pipe_shape(area, start):
-    up, left, right, down = get_neighbours(start)
-    if area[up] in '|7F':
-        if area[down] in '|LJ':
-            return '|'
-        if area[left] in '-LF':
-            return 'J'
-        if area[right] in '-J7':
-            return 'L'
-    if area[down] in '|LJ':
-        if area[left] in '-LF':
-            return '7'
-        if area[right] in '-J7':
-            return 'F'
-    return '-'
-
-
 def fill(start, loop, max_y, max_x):
     seen = set()
     heap = []
@@ -77,8 +60,7 @@ def zoom_in(loop):
 
 
 area, start, y, x = parse()
-_, loop = find_loop(area, start)
-area[start] = start_pipe_shape(area, start)
+loop = find_loop(area, start)
 max_y = y * 3 + 3
 max_x = x * 3 + 3
 zoomed_in = zoom_in(loop)

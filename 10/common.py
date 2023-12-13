@@ -10,7 +10,32 @@ def parse():
                 if c == 'S':
                     start = (y, x)
                 area[(y, x)] = c
+    area[start] = start_pipe_shape(area, start)
     return area, start, y, x
+
+
+def get_neighbours(current):
+    return ((current[0] - 1, current[1]),
+            (current[0], current[1] - 1),
+            (current[0], current[1] + 1),
+            (current[0] + 1, current[1]))
+
+
+def start_pipe_shape(area, start):
+    up, left, right, down = get_neighbours(start)
+    if area[up] in '|7F':
+        if area[down] in '|LJ':
+            return '|'
+        if area[left] in '-LF':
+            return 'J'
+        if area[right] in '-J7':
+            return 'L'
+    if area[down] in '|LJ':
+        if area[left] in '-LF':
+            return '7'
+        if area[right] in '-J7':
+            return 'F'
+    return '-'
 
 
 def next_in_loop(current, direction, area):
@@ -35,23 +60,16 @@ def next_in_loop(current, direction, area):
 
 
 def find_loop(area, start):
-    distances = {start: 0}
     loop = {start}
-    heap = []
-    heappush(heap, (0, start, 'N'))
-    heappush(heap, (0, start, 'W'))
-    heappush(heap, (0, start, 'S'))
-    heappush(heap, (0, start, 'E'))
-
-    while heap:
-        cur_d, cur_node, cur_dir = heappop(heap)
-        if (next_item := next_in_loop(cur_node, cur_dir, area)) is None:
-            continue
-        loop.add(next_item[0])
-        next_node, next_dir = next_item
-        new_d = cur_d + 1
-        if next_node not in distances or new_d < distances[next_node]:
-            heappush(heap, (new_d, next_node, next_dir))
-            distances[next_node] = new_d
-
-    return distances, loop
+    if area[start] in '|LJ':
+        cur_dir = 'N'
+    elif area[start] in 'F7':
+        cur_dir = 'S'
+    else:
+        cur_dir = 'E'
+    cur_node = start
+    while True:
+        cur_node, cur_dir = next_in_loop(cur_node, cur_dir, area)
+        loop.add(cur_node)
+        if cur_node == start:
+            return loop

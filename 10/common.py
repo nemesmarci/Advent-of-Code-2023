@@ -10,7 +10,7 @@ def parse():
                 if c == 'S':
                     start = (y, x)
                 area[(y, x)] = c
-    return area, start
+    return area, start, y, x
 
 
 def next_in_loop(current, direction, area):
@@ -32,6 +32,7 @@ def next_in_loop(current, direction, area):
         free = {'-': 'W', 'L': 'N', 'F': 'S'}
     next_dir = area[next_node]
     return None if next_dir in blocked else (next_node, free[next_dir])
+
 
 def find_loop(area, start):
     distances = {start: 0}

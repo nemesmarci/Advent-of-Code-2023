@@ -1,4 +1,3 @@
-from collections import defaultdict
 from heapq import heappush, heappop
 from common import parse, find_loop
 
@@ -27,13 +26,7 @@ def start_pipe_shape(area, start):
     return '-'
 
 
-def reduced_coords(y, x):
-    ry, n = divmod(y, 3)
-    rx, m = divmod(x, 3)
-    return (ry, rx) if n == m == 0 else None
-
-
-def fill(start, area):
+def fill(start, loop, max_y, max_x):
     seen = set()
     heap = []
     heappush(heap, start)
@@ -44,59 +37,65 @@ def fill(start, area):
         seen.add(cur_node)
         neighbours = get_neighbours(cur_node)
         for n in neighbours:
-            if n not in seen and area[n] == '.':
+            if n not in seen and 0 <= n[0] < max_y and 0 <= n[1] < max_x and n not in loop:
                 heappush(heap, n)
     return seen
 
 
-def enclosed(tile, area, enclosed_tiles, max_y, max_x):
+def enclosed(tile, loop, max_y, max_x):
     seen = set()
     heap = []
-    heappush(heap, (tile[0] * 3, tile[1] * 3))
+    heappush(heap, tile)
     while heap:
         cur_node = heappop(heap)
-        if (original_tile := reduced_coords(*cur_node)) \
-                and original_tile in enclosed_tiles:
-            break
         if cur_node in seen:
             continue
         seen.add(cur_node)
         neighbours = get_neighbours(cur_node)
         for n in neighbours:
-            if (not (0 <= n[0] < max_y)) or (not (0 <= n[1] < max_x)):
+            if not 0 <= n[0] < max_y or not 0 <= n[1] < max_x:
                 return False
-            if n not in seen and area[n] == '.':
+            if n not in seen and n not in loop:
                 heappush(heap, n)
     return True
 
 
-def zoom_in(area):
-    zoomed_in = defaultdict(lambda: '.')
+def zoom_in(loop):
+    zoomed_in = set()
     for y, x in loop:
         c = area[(y, x)]
-        zoomed_in[(3 * y + 1, 3 * x + 1)] = 'X'
+        zoomed_in.add((3 * y + 1, 3 * x + 1))
         if c in '|LJ':
-            zoomed_in[(3 * y, 3 * x + 1)] = 'X'
+            zoomed_in.add((3 * y, 3 * x + 1))
         if c in '|7F':
-            zoomed_in[(3 * y + 2, 3 * x + 1)] = 'X'
+            zoomed_in.add((3 * y + 2, 3 * x + 1))
         if c in '-J7':
-            zoomed_in[(3 * y + 1, 3 * x)] = 'X'
+            zoomed_in.add((3 * y + 1, 3 * x))
         if c in '-LF':
-            zoomed_in[(3 * y + 1, 3 * x + 2)] = 'X'
+            zoomed_in.add((3 * y + 1, 3 * x + 2))
     return zoomed_in
 
 
-area, start = parse()
+area, start, y, x = parse()
 _, loop = find_loop(area, start)
 area[start] = start_pipe_shape(area, start)
-max_y = max(b[0] for b in area) * 3
-max_x = max(b[1] for b in area) * 3
-zoomed_in = zoom_in(area)
+max_y = y * 3 + 3
+max_x = x * 3 + 3
+zoomed_in = zoom_in(loop)
 
 enclosed_tiles = set()
-for tile in filter(lambda x: x not in loop and x not in enclosed_tiles, area):
-    if enclosed(tile, zoomed_in, enclosed_tiles, max_y, max_x):
-        enclosed_tiles.add(tile)
-        enclosed_tiles |= fill(tile, area)
+enclosed_zoom = set()
+free_zoom = set()
 
+for tile in filter(lambda x: x not in loop, area):
+    zoom = tile[0] * 3, tile[1] * 3
+    if zoom in enclosed_zoom:
+        enclosed_tiles.add(tile)
+    elif zoom in free_zoom:
+        continue
+    elif enclosed(zoom, zoomed_in, max_y, max_x):
+        enclosed_tiles.add(tile)
+        enclosed_zoom |= fill(zoom, zoomed_in, max_y, max_x)
+    else:
+        free_zoom |= fill(zoom, zoomed_in, max_y, max_x)
 print(len(enclosed_tiles))

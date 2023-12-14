@@ -14,15 +14,11 @@ def parse():
     return area, start, y, x
 
 
-def get_neighbours(current):
-    return ((current[0] - 1, current[1]),
-            (current[0], current[1] - 1),
-            (current[0], current[1] + 1),
-            (current[0] + 1, current[1]))
-
-
 def start_pipe_shape(area, start):
-    up, left, right, down = get_neighbours(start)
+    up = start[0] - 1, start[1]
+    left = start[0], start[1] - 1
+    right = start[0], start[1] + 1
+    down = start[0] + 1, start[1]
     if area[up] in '|7F':
         if area[down] in '|LJ':
             return '|'
@@ -41,22 +37,17 @@ def start_pipe_shape(area, start):
 def next_in_loop(current, direction, area):
     if direction == 'N':
         next_node = (current[0] - 1, current[1])
-        blocked = '-LJ.S'
         free = {'|': 'N', '7': 'W', 'F': 'E'}
     elif direction == 'E':
         next_node = (current[0], current[1] + 1)
-        blocked = '|LF.S'
         free = {'-': 'E', 'J': 'N', '7': 'S'}
     elif direction == 'S':
         next_node = (current[0] + 1, current[1])
-        blocked = '-7F.S'
         free = {'|': 'S', 'L': 'E', 'J': 'W'}
     else:
         next_node = (current[0], current[1] - 1)
-        blocked = '|J7.S'
         free = {'-': 'W', 'L': 'N', 'F': 'S'}
-    next_dir = area[next_node]
-    return None if next_dir in blocked else (next_node, free[next_dir])
+    return next_node, free[area[next_node]]
 
 
 def find_loop(area, start):

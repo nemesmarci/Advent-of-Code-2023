@@ -5,7 +5,7 @@ def parse():
     rows = []
     descriptions = []
     with open('input.txt') as data:
-        for y, line in enumerate(data):
+        for line in data:
             t, d = line.strip().split()
             rows.append(t)
             descriptions.append(list(map(int, d.split(','))))

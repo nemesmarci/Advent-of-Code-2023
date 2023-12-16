@@ -18,7 +18,7 @@ def is_mirrored(side_a, side_b, smudge=False):
 def find_vertical_mirror(pattern, skip=None, smudge=False):
     for col in range(1, len(pattern[0])):
         if skip != col:
-            left = ([pattern[y][x] for y in range(len(pattern))] for x in range(col - 1, 0 - 1, -1))
+            left = (get_col(x, pattern) for x in range(col - 1, 0 - 1, -1))
             right = (get_col(x, pattern) for x in range(col, len(pattern[0])))
             if left and right and is_mirrored(left, right, smudge):
                 return col

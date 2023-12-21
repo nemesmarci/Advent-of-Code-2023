@@ -35,8 +35,8 @@ def get_next(y, x, d, s, min_straight, max_straight):
 
 def find_path(area, max_y, max_x, min_straight, max_straight):
     distances = dict()
-    distances[(0, 1, 'E', 1)] = 0
-    distances[(1, 0, 'S', 1)] = 0
+    distances[(0, 1, 'E', 1)] = area[(0, 1)]
+    distances[(1, 0, 'S', 1)] = area[(1, 0)]
     heap = []
     heappush(heap, (area[(0, 1)], 0, 1, 'E', 1))
     heappush(heap, (area[(1, 0)], 1, 0, 'S', 1))

@@ -5,7 +5,7 @@ rule_regex = re.compile(r'(\w+)([<>]?)(\d*):?(\w*)')
 
 def parse():
     with open('input.txt') as data:
-        raw_workflows, raw_parts = ''.join(data.readlines()).split('\n\n')
+        raw_workflows, raw_parts = ''.join(data).split('\n\n')
     workflows = {}
     for workflow in raw_workflows.split('\n'):
         workflow = workflow.replace('}', '')

@@ -6,7 +6,7 @@ xmas = 0
 for part in parts:
     step = 'in'
     while True:
-        if step in 'A':
+        if step == 'A':
             xmas += sum(part.values())
             break
         elif step == 'R':
@@ -19,6 +19,6 @@ for part in parts:
                 case field, '>', value, step:
                     if part[field] > int(value):
                         break
-                case step, _, _, _:
+                case step, *_:
                     pass
 print(xmas)
